@@ -8,11 +8,11 @@
 import SwiftUI
 
 struct HomeView: View {
-    
     @AppStorage("onboarding") var isOnboardinViewActive: Bool = true
+    @State private var isAnimating: Bool = false
     
     var body: some View {
-        VStack(spacing: 20){
+        VStack(spacing: 20) {
             // MARK: - HEADER
             
             Spacer()
@@ -22,7 +22,14 @@ struct HomeView: View {
                 Image("character-2")
                     .resizable()
                     .scaledToFit()
-                .padding()
+                    .padding()
+                    .offset(y: isAnimating ? 35 : -35)
+                    .animation(
+                        Animation
+                            .easeOut(duration: 4)
+                            .repeatForever(),
+                        value: isAnimating
+                    )
             }
             
             // MARK: - CENTER
@@ -40,9 +47,12 @@ struct HomeView: View {
             
             Spacer()
             
-            Button(action:{
-                isOnboardinViewActive = true
-            }){
+            Button(action: {
+                withAnimation {
+                    isOnboardinViewActive = true
+                }
+                
+            }) {
                 Image(systemName: "arrow.triangle.2.circlepath.circle.fill")
                     .imageScale(.large)
                 
@@ -53,7 +63,14 @@ struct HomeView: View {
             .buttonStyle(.borderedProminent)
             .buttonBorderShape(.capsule)
             .controlSize(.large)
-        }//: VSTACK
+        } //: VSTACK
+        .onAppear(
+            perform: {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    isAnimating = true
+                }
+            }
+        )
     }
 }
 
